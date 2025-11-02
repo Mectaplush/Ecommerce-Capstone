@@ -1,0 +1,20 @@
+{
+  "watch": [
+    "."
+  ],
+  "ignore": [
+    "node_modules",
+    ".git",
+    ".env",
+    ".yarn",
+    "dist",
+    "logs",
+    "*.log",
+    "*.md",
+    "docker-compose.yml",
+    "Dockerfile"
+  ],
+  "ext": "js,json",
+  "exec": "node server.js",
+  "delay": 1000
+}
