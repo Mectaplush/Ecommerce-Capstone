@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { v2 as cloudinary } from "cloudinary";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
+  
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
     return next(new ErrorHandler("Please provide all required fields.", 400));
@@ -80,7 +81,8 @@ export const logout = catchAsyncErrors(async (req, res, next) => {
 
 export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   const { email } = req.body;
-  const { frontendUrl } = req.query;
+  const frontendUrl =
+    process.env.FRONTEND_URL || req.query.frontend || "http://localhost:5173";
   let userResult = await database.query(
     `SELECT * FROM users WHERE email = $1`,
     [email]
@@ -157,7 +159,7 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
 export const updatePassword = catchAsyncErrors(async (req, res, next) => {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
-  console.log(currentPassword, newPassword, confirmNewPassword)
+  console.log(currentPassword, newPassword, confirmNewPassword);
   if (!currentPassword || !newPassword || !confirmNewPassword) {
     return next(new ErrorHandler("Please provide all required fields.", 400));
   }
@@ -204,12 +206,12 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
   if (name.trim().length === 0 || email.trim().length === 0) {
     return next(new ErrorHandler("Name and email cannot be empty.", 400));
   }
-  
+
   let avatarData = {};
   if (req.files && req.files.avatar) {
     try {
       const { avatar } = req.files;
-      
+
       // Xóa ảnh cũ nếu có
       if (req.user?.avatar?.public_id) {
         await cloudinary.uploader.destroy(req.user.avatar.public_id);
@@ -224,14 +226,19 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
           crop: "scale",
         }
       );
-      
+
       avatarData = {
         public_id: newProfileImage.public_id,
         url: newProfileImage.secure_url,
       };
     } catch (error) {
       console.error("Cloudinary error:", error);
-      return next(new ErrorHandler("Failed to upload avatar. Please check Cloudinary configuration.", 500));
+      return next(
+        new ErrorHandler(
+          "Failed to upload avatar. Please check Cloudinary configuration.",
+          500
+        )
+      );
     }
   }
 

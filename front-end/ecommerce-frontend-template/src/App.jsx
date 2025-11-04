@@ -22,8 +22,26 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "./store/slices/authSlice";
+import {Loader} from "lucide-react"
 
 const App = () => {
+  const {authUser, isCheckingAuth} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(getUser());
+  }, [getUser]);
+
+  if (isCheckingAuth && !authUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader className="w-10 h-10 animate-spin" />
+      </div>
+    );
+  }
   return (
     <>
       <ThemeProvider>
