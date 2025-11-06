@@ -35,7 +35,7 @@ const CartSidebar = () => {
       {/* OVERLAY  */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
-        onClick={() => dispatch(toggleSidebar())}
+        onClick={() => dispatch(toggleCart())}
       ></div>
 
       {/* CART SIDEBAR  */}
@@ -59,91 +59,95 @@ const CartSidebar = () => {
                 onClick={() => dispatch(toggleCart())}
                 className="inline-block mt-4 px-6 py-2 gradient-primary text-primary-foreground rounded-lg hover:underline animate-smooth"
               >
-                Browser Products
+                Browse Products
               </Link>
             </div>
           ) : (
             <>
-            {/* CART ITEMS */}
-            <div className="space-y-4 mb-6">
-              {cart &&
-                cart.map((item) => {
-                  return (
-                    <div key={item.product.id} className="glass-card p-4">
-                      <div className="flex items-center space-x-4">
-                        <img
-                          src={item.product.image[0].url}
-                          alt={item.product.name}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                        <div className="flex min-w-0">
-                          <h3 className="font-semibold text-foreground truncate">
-                            {item.product.name}
-                          </h3>
-                          <p className="text-primary font-semibold">
-                            ${item.product.price}
-                          </p>
-                        </div>
+              {/* CART ITEMS */}
+              <div className="space-y-4 mb-6">
+                {cart &&
+                  cart.map((item) => {
+                    return (
+                      <div key={item.product.id} className="glass-card p-4">
+                        <div className="flex items-start space-x-4">
+                          <img
+                            src={item.product.images[0].url}
+                            alt={item.product.name}
+                            className="w-16 h-16 object-cover rounded-lg"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground truncate">
+                              {item.product.name}
+                            </h3>
+                            <p className="text-primary font-semibold">
+                              ${item.product.price}
+                            </p>
 
-                        {/* QUANTITY CONTROLS  */}
-                        <div className="flex items-center space-x-3 mt-2">
-                          <button
-                            className="p-1 rounded glass-card hover:glow-on-hover animate-smooth"
-                            onClick={() => {
-                              updateQuantity(
-                                item.product.id,
-                                item.quantity - 1
-                              );
-                            }}
-                          >
-                            <Minus className="h-4 w-4 text-primary" />
-                          </button>
-                          <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                        
-                          <button
-                            onClick={() => {
-                              updateQuantity(
-                                item.product.id,
-                                item.quantity + 1
-                              );
-                            }}
-                            className="p-1 rounded glass-card hover:glow-on-hover animate-smooth"
-                          >
-                            <Plus className="h-4 w-4 text-primary" />
-                          </button>
-                         
-                          <button
-                            onClick={() => dispatch(removeFromCart(item.product.id))}
-                            className="p-1 rounded glass-card hover:glow-on-hover animate-smooth ml-2 text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive-foreground" />
-                          </button>
+                            {/* QUANTITY CONTROLS  */}
+                            <div className="flex items-center space-x-2 mt-2">
+                              <button
+                                className="p-1 rounded glass-card hover:glow-on-hover animate-smooth"
+                                onClick={() => {
+                                  updateQuantity(
+                                    item.product.id,
+                                    item.quantity - 1
+                                  );
+                                }}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                              <span className="w-8 text-center font-semibold">
+                                {item.quantity}
+                              </span>
+
+                              <button
+                                onClick={() => {
+                                  updateQuantity(
+                                    item.product.id,
+                                    item.quantity + 1
+                                  );
+                                }}
+                                className="p-1 rounded glass-card hover:glow-on-hover animate-smooth"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+
+                              <button
+                                onClick={() =>
+                                  dispatch(removeFromCart(item.product.id))
+                                }
+                                className="p-1 rounded glass-card hover:glow-on-hover animate-smooth ml-2 text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* QUANTITY CONTROLS  */}
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-            </div>
-
-            {/* CART TOTAL & CHECKOUT */}
-            <div className="border-t border-[hsla(var(--glass-border))] pt-4">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-semibold">
-                  Total:
-                </span>
-                <span className="text-xl font-bold text-primary">
-                  ${total.toFixed(2)}
-                </span>
+                    );
+                  })}
               </div>
-              <Link
-                to={"/cart"}
-                onClick={() => dispatch(toggleCart())}
-                className="w-full block text-center gradient-primary text-primary-foreground rounded-lg 
+
+              {/* CART TOTAL & CHECKOUT */}
+              <div className="border-t border-[hsla(var(--glass-border))] pt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-lg font-semibold">Total:</span>
+                  <span className="text-xl font-bold text-primary">
+                    ${total.toFixed(2)}
+                  </span>
+                </div>
+                <Link
+                  to={"/cart"}
+                  onClick={() => dispatch(toggleCart())}
+                  className="w-full block py-3 text-center gradient-primary text-primary-foreground rounded-lg 
                  hover:glow-on-hover animate-smooth font-semibold"
-              >
-                View Cart & Checkout
-              </Link>
-            </div>
+                >
+                  View Cart & Checkout
+                </Link>
+              </div>
             </>
           )}
         </div>

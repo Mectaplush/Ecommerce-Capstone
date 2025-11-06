@@ -22,10 +22,11 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./store/slices/authSlice";
 import {Loader} from "lucide-react"
+import { fetchAllProducts } from "./store/slices/productSlice";
 
 const App = () => {
   const {authUser, isCheckingAuth} = useSelector((state) => state.auth);
@@ -35,7 +36,21 @@ const App = () => {
     dispatch(getUser());
   }, [getUser]);
 
-  if (isCheckingAuth && !authUser) {
+  useEffect(() => {
+    dispatch(fetchAllProducts({
+      category: "",
+      price: `0-10000`,
+      rating: "",
+      availability: "",
+      page: 1,
+    }));
+  }, []);
+
+  const {products} = useSelector((state) => state.product);
+
+
+
+  if ((isCheckingAuth && !authUser) || !products) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader className="w-10 h-10 animate-spin" />
