@@ -2,8 +2,7 @@ import React from "react";
 import { Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addToCart} from "../../store/slices/cartSlice";
-
+import { addToCart } from "../../store/slices/cartSlice";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
@@ -13,6 +12,12 @@ const ProductCard = ({ product }) => {
     e.stopPropagation();
     dispatch(addToCart({ product, quantity: 1 }));
   };
+
+  const rating = Number(product.ratings ?? 0);
+  const display = Math.round(rating * 2) / 2; // ✅ làm tròn về 0.5 gần nhất
+  const fullStars = Math.floor(display); // số sao đầy
+  const hasHalf = display % 1 !== 0; // có nửa sao?
+  const totalStars = 5;
 
   return (
     <>
@@ -68,7 +73,7 @@ const ProductCard = ({ product }) => {
           {/* PRODUCT RATINGS  */}
           <div className="flex items-center mb-2 space-x-2">
             <div className="flex items-center">
-              {[...Array(5)].map((_, index) => {
+              {/* {[...Array(5)].map((_, index) => {
                 return (
                   <Star
                     key={index}
@@ -79,7 +84,55 @@ const ProductCard = ({ product }) => {
                     }`}
                   />
                 );
+              })} */}
+              {/* {[...Array(totalStars)].map((_, i) => {
+                if (i < full) {
+                  return (
+                    <Star
+                      key={i}
+                      className="w-4 h-4 text-yellow-400 fill-current"
+                    />
+                  );
+                } else if (i === full && showHalf) {
+                  return (
+                    <span key={i} className="relative w-4 h-4">
+                      <Star className="w-4 h-4 text-gray-300" />
+                      <Star
+                        className="w-4 h-4 text-yellow-400 fill-current absolute inset-0 overflow-hidden"
+                        style={{ clipPath: "inset(0 50% 0 0)" }}
+                      />
+                    </span>
+                  );
+                }
+                return <Star key={i} className="w-4 h-4 text-gray-300" />;
               })}
+              <span className="text-xs text-muted-foreground ml-1">
+                {rating.toFixed(1)}
+              </span> */}
+              {[...Array(totalStars)].map((_, i) => {
+                if (i < fullStars) {
+                  return (
+                    <Star
+                      key={i}
+                      className="w-4 h-4 text-yellow-400 fill-current"
+                    />
+                  );
+                } else if (i === fullStars && hasHalf) {
+                  return (
+                    <span key={i} className="relative w-4 h-4">
+                      <Star className="w-4 h-4 text-gray-300" />
+                      <Star
+                        className="w-4 h-4 text-yellow-400 fill-current absolute inset-0 overflow-hidden"
+                        style={{ clipPath: "inset(0 50% 0 0)" }}
+                      />
+                    </span>
+                  );
+                }
+                return <Star key={i} className="w-4 h-4 text-gray-300" />;
+              })}
+              <span className="text-xs text-muted-foreground ml-1">
+                {Number.isFinite(rating) ? rating.toFixed(1) : "0.0"}
+              </span>
             </div>
 
             <span className="text-sm text-muted-foreground">

@@ -93,9 +93,10 @@ export const fetchAllProducts = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Filter products by rating
-  if (ratings) {
-    conditions.push(`ratings >= $${index}`);
-    values.push(ratings);
+  const ratingNum = ratings ? Number(ratings) : null;
+  if (ratingNum && !Number.isNaN(ratingNum)) {
+    conditions.push(`FLOOR(ROUND(CAST(p.ratings AS numeric) * 2) / 2) = $${index}`);
+    values.push(ratingNum);
     index++;
   }
 
@@ -383,8 +384,9 @@ export const postProductReview = catchAsyncErrors(async (req, res, next) => {
     [productId]
   );
 
-  const newAvgRating = allReviews.rows[0].avg_rating;
-
+  // const newAvgRating = allReviews.rows[0].avg_rating;
+const rawAvg = Number(allReviews.rows[0].avg_rating || 0);
+const newAvgRating = parseFloat(rawAvg.toFixed(1));
   const updatedProduct = await database.query(
     `
         UPDATE products SET ratings = $1 WHERE id = $2 RETURNING *
@@ -416,7 +418,9 @@ export const deleteReview = catchAsyncErrors(async (req, res, next) => {
     [productId]
   );
 
-  const newAvgRating = allReviews.rows[0].avg_rating;
+  // const newAvgRating = allReviews.rows[0].avg_rating;
+  const rawAvg = Number(allReviews.rows[0].avg_rating || 0);
+  const newAvgRating = parseFloat(rawAvg.toFixed(1));
 
   const updatedProduct = await database.query(
     `

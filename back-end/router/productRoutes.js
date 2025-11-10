@@ -23,6 +23,7 @@ productRouter.post(
   createProduct
 );
 productRouter.get("/", fetchAllProducts);
+productRouter.post("/ai-search", isAuthenticated, fetchAIFilteredProducts);
 productRouter.get("/:productId", fetchSingleProduct);
 productRouter.put("/post-new/review/:productId", isAuthenticated, postProductReview);
 productRouter.delete("/delete/review/:productId", isAuthenticated, deleteReview);
@@ -38,6 +39,5 @@ productRouter.delete(
   authorizedRoles("Admin"),
   deleteProduct
 );
-productRouter.post("/ai-search", isAuthenticated, fetchAIFilteredProducts);
 
 export default productRouter;

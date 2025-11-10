@@ -25,30 +25,31 @@ import NotFound from "./pages/NotFound";
 import { use, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./store/slices/authSlice";
-import {Loader} from "lucide-react"
+import { Loader } from "lucide-react";
 import { fetchAllProducts } from "./store/slices/productSlice";
 
 const App = () => {
-  const {authUser, isCheckingAuth} = useSelector((state) => state.auth);
+  const { authUser, isCheckingAuth } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     dispatch(getUser());
   }, [getUser]);
 
   useEffect(() => {
-    dispatch(fetchAllProducts({
-      category: "",
-      price: `0-10000`,
-      rating: "",
-      availability: "",
-      page: 1,
-    }));
+    dispatch(
+      fetchAllProducts({
+        category: "",
+        price: `0-10000`,
+        search: "",
+        rating: "",
+        availability: "",
+        page: 1,
+      })
+    );
   }, []);
 
-  const {products} = useSelector((state) => state.product);
-
-
+  const { products } = useSelector((state) => state.product);
 
   if ((isCheckingAuth && !authUser) || !products) {
     return (

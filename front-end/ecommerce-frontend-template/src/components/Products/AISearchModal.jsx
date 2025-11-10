@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { X, Search, Sparkles } from "lucide-react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import { toggleAIModal } from "../../store/slices/popupSlice"
+import { fetchProductsWithAI } from "../../store/slices/productSlice";
 
 const AISearchModal = () => {
   const [userPrompt, setUserPrompt] = useState("");
-  const { aiSearching } = useSelector((state) => state.products);
-  const { isAIPopupOpen } = useSelector((state) => state.popup);
+  const { aiSearching } = useSelector((state) => state.product || {});
+  const { isAIPopupOpen } = useSelector((state) => state.popup || {});
 
   const exampleText = [
     "Find the best suitable GPU with Ryxen 5600x",
@@ -17,11 +19,12 @@ const AISearchModal = () => {
   const dispatch = useDispatch();
   const handleSearch = (e) => {
     e.preventDefault();
+    if(!userPrompt.trim()) return;
     //dispatch({ type: "AI_SEARCH", payload: userPrompt });
-    dispatch(fetchAIProducts(userPrompt));
+    dispatch(fetchProductsWithAI(userPrompt.trim()));
   };
 
-  if (!isAIPopupOpen) return null;ß
+  if (!isAIPopupOpen) return null;
 
   return (
     <div

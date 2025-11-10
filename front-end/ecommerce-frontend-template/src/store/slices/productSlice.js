@@ -79,7 +79,7 @@ export const fetchProductsWithAI = createAsyncThunk(
   "product/ai-search",
   async (userPrompt, thunkAPI) => {
     try {
-      const res = await axiosInstance.get(`/product/ai-search`, userPrompt);
+      const res = await axiosInstance.post(`/product/ai-search`, { userPrompt });
       thunkAPI.dispatch(toggleAIModal());
       return res.data;
     } catch (error) {
@@ -110,7 +110,10 @@ const productSlice = createSlice({
     })
     .addCase(fetchAllProducts.fulfilled, (state, action) => {
       state.loading = false;
-      state.products = action.payload.products;
+      state.products = action.payload.products.map(p => ({
+        ...p,
+        ratings: p.ratings ? parseFloat(p.ratings) : 0,
+      }) );
       state.newProducts = action.payload.newProducts;
       state.topRatedProducts = action.payload.topRatedProducts;
       state.totalProducts = action.payload.totalProducts;

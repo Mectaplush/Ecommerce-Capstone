@@ -1,12 +1,12 @@
 export const categories = [
   {
     id: "1",
-    name: "Electronics",
+    name: "Gaming",
     image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=300",
   },
   {
     id: "2",
-    name: "Fashion",
+    name: "Wearables",
     image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=300",
   },
   {

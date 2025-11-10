@@ -109,7 +109,7 @@ const ProductSlider = ({ title, products }) => {
                           <Star
                             key={index}
                             className={`w-4 h-4 ${
-                              index < Math.round(product.ratings)
+                              index < Math.floor(product.ratings)
                                 ? "text-yellow-400 fill-current"
                                 : "text-gray-300"
                             }`}
