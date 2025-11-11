@@ -1,5 +1,7 @@
 import React, { use, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Star } from "lucide-react";
+import { postReview, deleteReview } from "../../store/slices/productSlice";
 
 const ReviewsContainer = ({ product, productReviews }) => {
   const { authUser } = useSelector((state) => state.auth);
@@ -12,12 +14,18 @@ const ReviewsContainer = ({ product, productReviews }) => {
   const [rating, setRating] = useState(1);
   const [comment, setComment] = useState("");
 
+  // const handleReviewSubmit = (e) => {
+  //   e.preventDefault();
+  //   const data = new FormData();
+  //   data.append("rating", rating);
+  //   data.append("comment", comment);
+  //   dispatch(postReview({ productId: product.id, review: data }));
+  // };
   const handleReviewSubmit = (e) => {
     e.preventDefault();
-    const data = new FormData();
-    data.append("rating", rating);
-    data.append("comment", comment);
-    dispatch(postReview({ productId: product.id, review: data }));
+    if (!rating || rating < 1 || rating > 5) return;
+    const payload = { rating: Number(rating), comment: comment.trim() }; // ✅ JSON
+    dispatch(postReview({ productId: product.id, review: payload }));
   };
   return (
     <>
@@ -47,14 +55,16 @@ const ReviewsContainer = ({ product, productReviews }) => {
             placeholder="Write your review..."
             className="w-full p-3 rounded-md border-border bg-background text-foreground"
           >
-            <button
-              type="submit"
-              disabled={isPostingReview}
-              className="px-6 py-2 rounded-lg bg-primary text-white font-semibold hover:glow-on-hover animate-smooth disabled:opacity-50"
-            >
-              {isPostingReview ? "Submitting..." : "Submit Review"}
-            </button>
+            {" "}
           </textarea>
+
+          <button
+            type="submit"
+            disabled={isPostingReview}
+            className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-semibold hover:glow-on-hover animate-smooth disabled:opacity-50"
+          >
+            {isPostingReview ? "Submitting..." : "Submit Review"}
+          </button>
         </form>
       )}
 
@@ -84,7 +94,7 @@ const ReviewsContainer = ({ product, productReviews }) => {
                             <Star
                               key={index}
                               className={`w-4 h-4 ${
-                                index < Math.round(product.ratings)
+                                index < Math.round(review.rating)
                                   ? "text-yellow-400 fill-current"
                                   : "text-gray-300"
                               }`}
@@ -94,21 +104,32 @@ const ReviewsContainer = ({ product, productReviews }) => {
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground mb-2">{review.comment}</p>
-                        {
-                          authUser ?.id === review.reviewer?.id && (
-                            <button onClick={()=> dispatch(deleteReview(product.id,review.id))}
-                            className="my-6 w-fit items-center space-x-3 p-3 rounded-lg glass-card hover:glow-on-hover text-destructive hover:text-destructive-foreground group">
-                             {
-                              isReviewDeleting ? (<>
-                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
-                              </div> {""}
-                              <span>Deleting Review...</span>
-                              </>) : (<span>Delete Review</span>)
-                             }
-                            </button>
+                    <p className="text-muted-foreground mb-2">
+                      {review.comment}
+                    </p>
+                    {authUser?.id === review.reviewer?.id && (
+                      <button
+                        onClick={() =>
+                          dispatch(
+                            deleteReview({
+                              productId: product.id,
+                              reviewId: review.id,
+                            })
                           )
                         }
+                        className="my-6 w-fit items-center space-x-3 p-3 rounded-lg glass-card hover:glow-on-hover text-destructive hover:text-destructive-foreground group"
+                      >
+                        {isReviewDeleting ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>{" "}
+                            {""}
+                            <span>Deleting Review...</span>
+                          </>
+                        ) : (
+                          <span>Delete Review</span>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -116,7 +137,9 @@ const ReviewsContainer = ({ product, productReviews }) => {
           })}
         </div>
       ) : (
-        <p className="text-muted-foreground">No reviews yet. Be the first one to review this product</p>
+        <p className="text-muted-foreground">
+          No reviews yet. Be the first one to review this product
+        </p>
       )}
     </>
   );

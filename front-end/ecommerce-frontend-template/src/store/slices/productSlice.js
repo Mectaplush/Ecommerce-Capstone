@@ -49,7 +49,7 @@ export const postReview = createAsyncThunk(
   "product/post-new/review",
   async ({productId, review}, thunkAPI) => {
     try {
-      const res = await axiosInstance.put(`/product/post-new/review/${productId}`, {review});
+      const res = await axiosInstance.put(`/product/post-new/review/${productId}`, review);
       toast.success("Review posted successfully");
       return res.data.review;
     } catch (error) {
@@ -127,7 +127,7 @@ const productSlice = createSlice({
     .addCase(fetchProductDetails.fulfilled, (state, action) => {
       state.loading = false;
       state.productDetails = action.payload;
-      state.productDetails.reviews = action.payload.reviews;
+      state.productReviews = action.payload.reviews;
     })
     .addCase(fetchProductDetails.rejected, (state) => {
       state.loading = false;

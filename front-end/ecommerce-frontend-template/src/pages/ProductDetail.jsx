@@ -11,9 +11,272 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import ReviewsContainer from "../components/Products/ReviewsContainer";
+import { fetchProductDetails } from "../store/slices/productSlice";
+import { addToCart } from "../store/slices/cartSlice";
 
 const ProductDetail = () => {
-  return <></>;
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const product = useSelector((state) => state.product?.productDetails);
+  const { loading, productReviews } = useSelector((state) => state.product);
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState("description");
+
+  const handleAddToCart = () => {
+    dispatch(addToCart({ product, quantity }));
+  };
+  const rating = Number(product.ratings ?? 0);
+  const display = Math.round(rating * 2) / 2; // ✅ làm tròn về 0.5 gần nhất
+  const fullStars = Math.floor(display); // số sao đầy
+  const hasHalf = display % 1 !== 0; // có nửa sao?
+  const totalStars = 5;
+
+  useEffect(() => {
+    dispatch(fetchProductDetails(id));
+  }, [dispatch, id]);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen pt-20 flex justify-center items-center">
+        <div clfassName="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
+            Product Not Found
+          </h1>
+          <p className="text-muted-foreground">
+            The product you're looking for does not exist.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <Loader className="size-10 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="min-h-screen pt-20">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-6">
+            <div>
+              <div className="glass-card p-4 mb-4">
+                {product.images ? (
+                  <img
+                    src={product.images[selectedImage]?.url}
+                    alt={product.name}
+                    className="w-full h-96 object-contain rounded-lg"
+                  />
+                ) : (
+                  <div className="glass-card min-h-[418px] p-4 mb-4 animate-pulse" />
+                )}
+              </div>
+              <div className="flex space-x-2">
+                {product.images &&
+                  product?.images.map((image, index) => {
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImage(index)}
+                        className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                          selectedImage === index
+                            ? "border-primary"
+                            : "border-transparent"
+                        }`}
+                      >
+                        <img
+                          src={image.url}
+                          alt={`${product.title} - ${index + 1}`}
+                          // className={`w-24 h-24 object-cover rounded-lg cursor-pointer ${
+                          //   index === selectedImage
+                          //     ? "ring-2 ring-blue-500"
+                          //     : ""
+                          // }`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-4">
+                <div className="flex space-x-2 mb-4">
+                  {new Date() - new Date(product.created_at) <
+                    30 * 24 * 60 * 60 * 1000 && (
+                    <span className="px-2 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded">
+                      New
+                    </span>
+                  )}
+                  {product.ratings >= 4.5 && (
+                    <span className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-rose-500 text-white bg-primary text-primary-foreground text-xs font-semibold rounded">
+                      TOP RATED
+                    </span>
+                  )}
+                </div>
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  {product.name}
+                </h1>
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="flex items-center space-x-1">
+                    {[...Array(totalStars)].map((_, i) => {
+                      if (i < fullStars) {
+                        return (
+                          <Star
+                            key={i}
+                            className="w-4 h-4 text-yellow-400 fill-current"
+                          />
+                        );
+                      } else if (i === fullStars && hasHalf) {
+                        return (
+                          <span key={i} className="relative w-4 h-4">
+                            <Star className="w-4 h-4 text-gray-300" />
+                            <Star
+                              className="w-4 h-4 text-yellow-400 fill-current absolute inset-0 overflow-hidden"
+                              style={{ clipPath: "inset(0 50% 0 0)" }}
+                            />
+                          </span>
+                        );
+                      }
+                      return <Star key={i} className="w-4 h-4 text-gray-300" />;
+                    })}
+                    <span className="text-foreground font-medium ml-2">
+                      {Number.isFinite(rating) ? rating.toFixed(1) : "0.0"}
+                    </span>
+                    <span className="text-muted-foreground">
+                      ({productReviews?.length}) reviews
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4 mb-6">
+                  <span className="text-2xl font-bold text-primary">
+                    ${product.price}
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-4 mb-6">
+                  <span className="text-muted-foreground">
+                    Category: {product.category}
+                  </span>
+                  <span
+                    className={`px-3 py-1 rounded text-sm ${
+                      product.stock > 5
+                        ? "bg-green-500/20 text-gray-400"
+                        : product.stock > 0
+                        ? "bg-yellow-500/20 text-yellow-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
+                  >
+                    {product.stock > 5
+                      ? "In Stock"
+                      : product.stock > 0
+                      ? "Limited Stock"
+                      : "Out of Stock"}
+                  </span>
+                </div>
+
+                <div className="glass-card p-6 mb-6">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <span className="text-lg font-medium">Quantity:</span>
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="p-2 glass-card hover:glow-on-hover animate-smooth"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-12 text-center font-semibold text-lg">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="p-2 glass-card hover:glow-on-hover animate-smooth"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={product.stock === 0}
+                      className="flex items-center justify-center space-x-2 py-3 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      <span>Add to Cart</span>
+                    </button>
+                    <button
+                      disabled={product.stock === 0}
+                      className="py-3 bg-secondary text-foreground border border-border rounded-lg hover:bg-accent animate-smooth font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
+                  <div className="flex items-center space-x-4 mt-4">
+                    <button className="flex items-center space-x-2 text-muted-foreground hover:text-primary animate-smooth">
+                      <Heart className="w-5 h-5" />
+                      <span>Add to Wishlist</span>
+                    </button>
+                    <button className="flex items-center space-x-2 text-muted-foreground hover:text-primary animate-smooth">
+                      <Share2 className="w-5 h-5" />
+                      <span>Share</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-panel w-full">
+            <div className="flex border-b border-[hsla(var(--glass-border))]">
+              {["description", "reviews"].map((tab) => {
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-6 py-4 font-medium capitalize transition-all ${
+                      activeTab === tab
+                        ? "border-b-2 border-primary text-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab === "description" ? "Description" : "Reviews"}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="p-6">
+              {activeTab === "description" && (
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    Product Description
+                  </h3>
+                  <p className="text-muted-foreground loading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+              )}
+              {activeTab === "reviews" && (
+                <>
+                  <ReviewsContainer
+                    product={product}
+                    productReviews={productReviews}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default ProductDetail;

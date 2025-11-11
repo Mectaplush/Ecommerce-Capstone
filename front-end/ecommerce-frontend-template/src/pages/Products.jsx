@@ -35,7 +35,7 @@ const Products = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log("Dispatch fetchAllProducts ratings=", selectedRating);
+   // console.log("Dispatch fetchAllProducts ratings=", selectedRating);
     dispatch(
       fetchAllProducts({
         //category: searchedCategory,

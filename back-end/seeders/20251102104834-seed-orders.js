@@ -23,7 +23,7 @@ export const up = async (queryInterface, Sequelize) => {
         total_price: 1449.98,
         tax_price: 144.99,
         shipping_price: 15.00,
-        order_status: 'Delivered',
+        order_status: 'Paid',
         paid_at: new Date('2024-10-15T10:30:00'),
         created_at: new Date('2024-10-15T10:00:00')
       },
@@ -33,7 +33,7 @@ export const up = async (queryInterface, Sequelize) => {
         total_price: 429.99,
         tax_price: 42.99,
         shipping_price: 10.00,
-        order_status: 'Shipped',
+        order_status: 'Paid',
         paid_at: new Date('2024-10-25T14:20:00'),
         created_at: new Date('2024-10-25T14:00:00')
       },

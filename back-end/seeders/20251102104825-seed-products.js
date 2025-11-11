@@ -1,3 +1,4 @@
+import { url } from "inspector";
 import { v4 as uuidv4 } from "uuid";
 
 export const up = async (queryInterface, Sequelize) => {
@@ -132,8 +133,20 @@ export const up = async (queryInterface, Sequelize) => {
         ratings: 4.8,
         images: JSON.stringify([
           {
-            public_id: "products/ipadpro129",
+            public_id: "products/ipadpro129-1",
             url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSP3GdjFwKgK6KTGAzTTZ0SB5mgDBjaFgKOnA&s",
+          },
+          {
+            public_id: "products/ipadpro129-2",
+            url: "https://cdn.tgdd.vn/Files/2020/03/20/1243461/ipad2020_640x360-600x400.gif",
+          },
+          {
+            public_id: "products/ipadpro129-3",
+            url: "https://cdn.dribbble.com/userupload/41040196/file/original-4732aac0c202fc83a864b8071b4c0293.gif",
+          },
+          {
+            public_id: "products/ipadpro129-4",
+            url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxLUv90D3iCFfcA82B9goZNUTRSNaNWVuyKw&s",
           },
         ]),
         stock: 60,
@@ -150,8 +163,24 @@ export const up = async (queryInterface, Sequelize) => {
         ratings: 4.7,
         images: JSON.stringify([
           {
-            public_id: "products/applewatch9",
+            public_id: "products/applewatch9-1",
             url: "https://i.pinimg.com/originals/7a/56/08/7a56089f2227e24a5a22b3256b22e437.gif",
+          },
+          {
+            public_id: "products/applewatch9-2",
+            url: "https://cdn.mos.cms.futurecdn.net/vUuMdp7uxnvr9bQbeCDyAh.gif",
+          },
+          {
+            public_id: "products/applewatch9-3",
+            url: "https://cdn.dribbble.com/userupload/41751066/file/original-5e3b27908a413d34693547df203aa2c6.gif",
+          },
+          {
+            public_id: "products/applewatch9-4",
+            url: "https://i.pinimg.com/originals/c1/6c/ec/c16cecd9db6689619a8fe34d9d51e377.gif",
+          },
+          {
+            public_id: "products/applewatch9-5",
+            url: "https://i.pinimg.com/originals/6c/63/ec/6c63eca2132879065f428de2b39677ec.gif",
           },
         ]),
         stock: 80,
@@ -305,8 +334,7 @@ export const up = async (queryInterface, Sequelize) => {
       {
         id: uuidv4(),
         name: 'Samsung Neo QLED QN90C 55"',
-        description:
-          "4K Mini LED TV with Quantum Matrix Technology and HDR",
+        description: "4K Mini LED TV with Quantum Matrix Technology and HDR",
         price: 1599.99,
         category: "TVs",
         ratings: 3.5,
@@ -338,17 +366,18 @@ export const up = async (queryInterface, Sequelize) => {
         created_by: adminId,
         created_at: new Date(),
       },
-     {
+      {
         id: uuidv4(),
         name: "Apple Vision Pro",
-        description: "Spatial computing headset with micro‑OLED displays and advanced eye & hand tracking",
+        description:
+          "Spatial computing headset with micro‑OLED displays and advanced eye & hand tracking",
         price: 3499.99,
         category: "VR",
         ratings: 4.9,
         images: JSON.stringify([
           {
             public_id: "products/apple-vision-pro",
-            url:"https://mir-s3-cdn-cf.behance.net/project_modules/disp/502afc173636911.649399daee4fb.gif",        
+            url: "https://mir-s3-cdn-cf.behance.net/project_modules/disp/502afc173636911.649399daee4fb.gif",
           },
         ]),
         stock: 12,
@@ -358,7 +387,8 @@ export const up = async (queryInterface, Sequelize) => {
       {
         id: uuidv4(),
         name: "Meta Quest 3",
-        description: "Mixed reality VR headset with high-res color passthrough and improved performance",
+        description:
+          "Mixed reality VR headset with high-res color passthrough and improved performance",
         price: 499.99,
         category: "VR",
         ratings: 4.6,
@@ -375,24 +405,34 @@ export const up = async (queryInterface, Sequelize) => {
       {
         id: uuidv4(),
         name: "Sony PlayStation VR2",
-        description: "Next-gen VR system with OLED HDR displays and eye tracking for PS5",
+        description:
+          "Next-gen VR system with OLED HDR displays and eye tracking for PS5",
         price: 549.99,
         category: "VR",
         ratings: 4,
         images: JSON.stringify([
           {
-            public_id: "products/psvr2",
+            public_id: "products/psvr2-1",
             url: "https://old.haloshop.vn/image/catalog/products/phu-kien-game/sony-playstation/playstation-vr2-24.gif",
+          },
+          {
+            public_id: "products/psvr2-2",
+            url: "https://www.auganix.org/wp-content/uploads/2023/02/PS-VR2-controller-feedback.gif",
+          },
+          {
+            public_id: "products/psvr2-3",
+            url: "https://media.tenor.com/oUsEPtHRd6MAAAAM/playstation-playstation-5.gif",
           },
         ]),
         stock: 0,
         created_by: adminId,
         created_at: new Date(),
       },
-       {
+      {
         id: uuidv4(),
         name: "Ray-Ban Meta Smart Glasses",
-        description: "Stylish smart glasses with camera, audio, and hands-free sharing",
+        description:
+          "Stylish smart glasses with camera, audio, and hands-free sharing",
         price: 299.99,
         category: "Wearables",
         ratings: 4.3,
@@ -409,7 +449,8 @@ export const up = async (queryInterface, Sequelize) => {
       {
         id: uuidv4(),
         name: "XREAL Air 2",
-        description: "Lightweight AR glasses with improved brightness and color accuracy",
+        description:
+          "Lightweight AR glasses with improved brightness and color accuracy",
         price: 399.99,
         category: "Wearables",
         ratings: 3,
