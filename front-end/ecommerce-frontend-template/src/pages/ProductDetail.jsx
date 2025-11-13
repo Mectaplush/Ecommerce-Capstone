@@ -7,9 +7,12 @@ import {
   Share2,
   Plus,
   Minus,
+  CircleDollarSign,
   Loader,
 } from "lucide-react";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import ReviewsContainer from "../components/Products/ReviewsContainer";
 import { fetchProductDetails } from "../store/slices/productSlice";
 import { addToCart } from "../store/slices/cartSlice";
@@ -23,14 +26,33 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
-  const handleAddToCart = () => {
-    dispatch(addToCart({ product, quantity }));
-  };
   const rating = Number(product.ratings ?? 0);
   const display = Math.round(rating * 2) / 2; // ✅ làm tròn về 0.5 gần nhất
   const fullStars = Math.floor(display); // số sao đầy
   const hasHalf = display % 1 !== 0; // có nửa sao?
   const totalStars = 5;
+
+  const handleAddToCart = () => {
+    dispatch(addToCart({ product, quantity }));
+  };
+
+  const handleCopyURL = () => {
+    const currentURL = window.location.href;
+    navigator.clipboard
+      .writeText(currentURL)
+      .then(() => {
+        toast.success("Product URL copied to clipboard!", currentURL);
+      })
+      .catch((err) => {
+        toast.error("Failed to copy URL: " + err);
+      });
+  };
+
+  const navigateTo = useNavigate();
+  const handleBuyNow = () => {
+    dispatch(addToCart({ product, quantity }));
+    navigateTo("/payment");
+  };
 
   useEffect(() => {
     dispatch(fetchProductDetails(id));
@@ -213,10 +235,13 @@ const ProductDetail = () => {
                       <span>Add to Cart</span>
                     </button>
                     <button
+                      onClick={handleBuyNow}
                       disabled={product.stock === 0}
-                      className="py-3 bg-secondary text-foreground border border-border rounded-lg hover:bg-accent animate-smooth font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                      //className="flex items-center justify-center space-x-2 py-3 bg-secondary text-foreground border border-border rounded-lg hover:bg-accent animate-smooth font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center justify-center space-x-2 py-3 gradient-primary text-primary-foreground rounded-lg hover:glow-on-hover animate-smooth font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Buy Now
+                      <CircleDollarSign className="w-5 h-5" />
+                      <span>Buy Now</span>
                     </button>
                   </div>
                   <div className="flex items-center space-x-4 mt-4">
@@ -224,7 +249,10 @@ const ProductDetail = () => {
                       <Heart className="w-5 h-5" />
                       <span>Add to Wishlist</span>
                     </button>
-                    <button className="flex items-center space-x-2 text-muted-foreground hover:text-primary animate-smooth">
+                    <button
+                      onClick={handleCopyURL}
+                      className="flex items-center space-x-2 text-muted-foreground hover:text-primary animate-smooth"
+                    >
                       <Share2 className="w-5 h-5" />
                       <span>Share</span>
                     </button>

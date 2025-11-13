@@ -4,16 +4,30 @@ import database from "../database/db.js";
 import { generatePaymentIntent } from "../utils/generatePaymentIntent.js";
 
 export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
-  const {
-    full_name,
-    state,
-    city,
-    country,
-    address,
-    pincode,
-    phone,
-    orderedItems,
-  } = req.body;
+  // const {
+  //   full_name,
+  //   state,
+  //   city,
+  //   country,
+  //   address,
+  //   pincode,
+  //   phone,
+  //   orderedItems,
+  // } = req.body;
+  const full_name = req.body.full_name || req.body.fullName;
+  const state = req.body.state;
+  const city = req.body.city;
+  const country = req.body.country;
+  const address = req.body.address;
+  const pincode = req.body.pincode || req.body.zipCode;
+  const phone = req.body.phone;
+
+  const orderedItems = req.body.orderedItems || req.body.orderItems;
+  const items = Array.isArray(orderedItems)
+    ? orderedItems
+    : orderedItems
+    ? JSON.parse(orderedItems)
+    : [];
   if (
     !full_name ||
     !state ||
@@ -28,9 +42,10 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  const items = Array.isArray(orderedItems)
-    ? orderedItems
-    : JSON.parse(orderedItems);
+  //old items for Carmelt code
+  // const items = Array.isArray(orderedItems)
+  //   ? orderedItems
+  //   : JSON.parse(orderedItems);
 
   if (!items || items.length === 0) {
     return next(new ErrorHandler("No items in cart.", 400));
@@ -91,8 +106,8 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
   );
 
   const orderResult = await database.query(
-    `INSERT INTO orders (buyer_id, total_price, tax_price, shipping_price) VALUES ($1, $2, $3, $4) RETURNING *`,
-    [req.user.id, total_price, tax_price, shipping_price]
+    `INSERT INTO orders (buyer_id, total_price, tax_price, shipping_price, paid_at) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+    [req.user.id, total_price, tax_price, shipping_price, new Date()]
   );
 
   const orderId = orderResult.rows[0].id;
@@ -119,6 +134,11 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
 
   const paymentResponse = await generatePaymentIntent(orderId, total_price);
 
+  await database.query(
+    `UPDATE orders SET paid_at = NOW() WHERE id = $1 RETURNING *;`,
+    [orderId]
+  );
+
   if (!paymentResponse.success) {
     return next(new ErrorHandler("Payment failed. Try again.", 500));
   }
@@ -126,8 +146,10 @@ export const placeNewOrder = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Order placed successfully. Please proceed to payment.",
-    paymentIntent: paymentResponse.clientSecret,
+    orderId,
     total_price,
+    paymentIntent: paymentResponse.clientSecret,
+    paymentIntentId: paymentResponse.paymentIntentId,
   });
 });
 
@@ -160,7 +182,7 @@ json_build_object(
 FROM orders o
 LEFT JOIN order_items oi ON o.id = oi.order_id
 LEFT JOIN shipping_info s ON o.id = s.order_id
-WHERE o.id = $1
+WHERE o.id = $1 
 GROUP BY o.id, s.id;
 `,
     [orderId]
@@ -206,6 +228,7 @@ GROUP BY o.id, s.id
         `,
     [req.user.id]
   );
+  // WHERE o.buyer_id = $1 AND o.paid_at IS NOT NULL
 
   res.status(200).json({
     success: true,
