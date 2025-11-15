@@ -79,44 +79,100 @@ export const logout = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
+// export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
+//   const { email } = req.body;
+//   const frontendUrl =
+//     process.env.FRONTEND_URL || process.env.DASHBOARD_URL || req.query.frontend || "http://localhost:5174";
+//   let userResult = await database.query(
+//     `SELECT * FROM users WHERE email = $1`,
+//     [email]
+//   );
+//   if (userResult.rows.length === 0) {
+//     return next(new ErrorHandler("User not found with this email.", 404));
+//   }
+//   const user = userResult.rows[0];
+//   const { hashedToken, resetPasswordExpireTime, resetToken } =
+//     generateResetPasswordToken();
+
+//   await database.query(
+//     `UPDATE users SET reset_password_token = $1, reset_password_expire = to_timestamp($2) WHERE email = $3`,
+//     [hashedToken, resetPasswordExpireTime / 1000, email]
+//   );
+
+//   const resetPasswordUrl = `${frontendUrl}/password/reset/${resetToken}`;
+
+//   const message = generateEmailTemplate(resetPasswordUrl);
+
+//   try {
+//     await sendEmail({
+//       email: user.email,
+//       subject: "Ecommerce Password Recovery",
+//       message,
+//     });
+//     res.status(200).json({
+//       success: true,
+//       message: `Email sent to ${user.email} successfully.`,
+//     });
+//   } catch (error) {
+//     await database.query(
+//       `UPDATE users SET reset_password_token = NULL, reset_password_expire = NULL WHERE email = $1`,
+//       [email]
+//     );
+//     return next(new ErrorHandler("Email could not be sent.", 500));
+//   }
+// });
+
+// ...existing imports...
 export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
-  const { email } = req.body;
-  const frontendUrl =
-    process.env.FRONTEND_URL || req.query.frontend || "http://localhost:5173";
-  let userResult = await database.query(
-    `SELECT * FROM users WHERE email = $1`,
-    [email]
+  const rawEmail = String(req.body.email || "");
+  const normalizedEmail = rawEmail.trim().toLowerCase();
+
+  // Lấy origin ưu tiên từ body -> query -> header -> ENV -> default
+  const headerOrigin = req.get("origin") || "";
+  const headerReferer = req.get("referer") || "";
+  const refererOrigin = headerReferer ? new URL(headerReferer).origin : "";
+
+  const frontendOrigin =
+    req.body.frontend ||
+    req.query.frontend ||
+    headerOrigin ||
+    refererOrigin ||
+    process.env.FRONTEND_URL ||
+    process.env.DASHBOARD_URL ||
+    "http://localhost:5173";
+
+  // đảm bảo không có dấu / cuối
+  const frontendUrl = frontendOrigin.replace(/\/$/, "");
+
+  const userResult = await database.query(
+    `SELECT * FROM users WHERE LOWER(email) = $1`,
+    [normalizedEmail]
   );
   if (userResult.rows.length === 0) {
     return next(new ErrorHandler("User not found with this email.", 404));
   }
   const user = userResult.rows[0];
+
   const { hashedToken, resetPasswordExpireTime, resetToken } =
     generateResetPasswordToken();
 
   await database.query(
-    `UPDATE users SET reset_password_token = $1, reset_password_expire = to_timestamp($2) WHERE email = $3`,
-    [hashedToken, resetPasswordExpireTime / 1000, email]
+    `UPDATE users SET reset_password_token = $1, reset_password_expire = to_timestamp($2)
+     WHERE LOWER(email) = $3`,
+    [hashedToken, resetPasswordExpireTime / 1000, normalizedEmail]
   );
 
   const resetPasswordUrl = `${frontendUrl}/password/reset/${resetToken}`;
-
   const message = generateEmailTemplate(resetPasswordUrl);
 
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Ecommerce Password Recovery",
-      message,
-    });
-    res.status(200).json({
-      success: true,
-      message: `Email sent to ${user.email} successfully.`,
-    });
+    await sendEmail({ email: user.email, subject: "Ecommerce Password Recovery", message });
+    res.status(200).json({ success: true, message: `Email sent to ${user.email} successfully.` });
   } catch (error) {
     await database.query(
-      `UPDATE users SET reset_password_token = NULL, reset_password_expire = NULL WHERE email = $1`,
-      [email]
+      `UPDATE users SET reset_password_token = NULL, reset_password_expire = NULL
+       WHERE LOWER(email) = $1`,
+      [normalizedEmail]
     );
     return next(new ErrorHandler("Email could not be sent.", 500));
   }
@@ -159,7 +215,6 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
 export const updatePassword = catchAsyncErrors(async (req, res, next) => {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
-  console.log(currentPassword, newPassword, confirmNewPassword);
   if (!currentPassword || !newPassword || !confirmNewPassword) {
     return next(new ErrorHandler("Please provide all required fields.", 400));
   }

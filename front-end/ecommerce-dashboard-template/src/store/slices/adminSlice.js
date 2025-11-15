@@ -18,7 +18,9 @@ export const adminSlice = createSlice({
     newUsersThisMonth: 0,
     currentMonthSales: 0,
   },
-  reducers: {},
+  reducers: {
+    
+  },
 });
 
 export default adminSlice.reducer;

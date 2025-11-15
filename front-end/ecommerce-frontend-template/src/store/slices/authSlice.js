@@ -59,16 +59,37 @@ export const logout = createAsyncThunk(
   }
 );
 
+// export const forgotPassword = createAsyncThunk(
+//   "auth/password/forgot",
+//   async (email, thunkAPI) => {
+//     try {
+//       const res = await axiosInstance.post("/auth/password/forgot", { email });
+//       toast.success(res.data.message);
+//       return null;
+//     } catch (error) {
+//       toast.error(error.response.data.message);
+//       return thunkAPI.rejectWithValue(error.response.data.message);
+//     }
+//   }
+// );
+
+// ...existing code...
 export const forgotPassword = createAsyncThunk(
   "auth/password/forgot",
-  async (email, thunkAPI) => {
+  async ({ email, frontend }, thunkAPI) => {
     try {
-      const res = await axiosInstance.post("/auth/password/forgot", { email });
+      const payload = {
+        email: String(email || "").trim().toLowerCase(),
+        frontend: frontend || window.location.origin,
+      };
+      const res = await axiosInstance.post("/auth/password/forgot", payload);
       toast.success(res.data.message);
       return null;
     } catch (error) {
-      toast.error(error.response.data.message);
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Forgot Password Failed");
+      return thunkAPI.rejectWithValue(
+        error?.response?.data?.message || "Forgot Password Failed"
+      );
     }
   }
 );

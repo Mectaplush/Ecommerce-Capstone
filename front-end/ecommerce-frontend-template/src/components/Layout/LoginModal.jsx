@@ -25,6 +25,21 @@ const LoginModal = () => {
     confirmPassword: "",
   });
 
+  // AI Reset khi popup mở hoặc mode thay đổi
+  useEffect(() => {
+    if (isAuthPopupOpen) {
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    }
+  }, [isAuthPopupOpen, mode]);
+  
+  const clearForm = () =>
+    setFormData({ name: "", email: "", password: "", confirmPassword: "" });
+
   // Detect reset password URL and open popup
   useEffect(() => {
     if (location.pathname.startsWith("/password/reset")) {
@@ -46,7 +61,8 @@ const LoginModal = () => {
     if (mode === "forgot") {
       // ❌ dispatch(forgotPassword({ email: formData.email }))
       // ✅  Gửi trực tiếp email string
-      dispatch(forgotPassword(formData.email)).then(() => {
+      //dispatch(forgotPassword(formData.email)).then(() => {
+      dispatch(forgotPassword({ email: formData.email })).then(() => {
         //dispatch(toggleAuthPopup());
         setMode("signin");
       });
@@ -63,6 +79,7 @@ const LoginModal = () => {
         })
       ).then(() => {
         //dispatch(toggleAuthPopup());
+        clearForm();
         setMode("signin");
       });
       return;
@@ -72,15 +89,11 @@ const LoginModal = () => {
       dispatch(register(data));
     } else {
       dispatch(login(data));
+      clearForm();
     }
 
     if (authUser) {
-      setFormData({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
+      clearForm();
     }
   };
  
@@ -126,7 +139,6 @@ const LoginModal = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  autoComplete="name"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none"
                   required
                 />
@@ -139,12 +151,12 @@ const LoginModal = () => {
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="email"
+                  name="email"
                   placeholder="Email Address"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  autoComplete="email"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none"
                   required
                 />
@@ -157,14 +169,12 @@ const LoginModal = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="password"
+                  name="password"
                   placeholder="Password"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  autoComplete={
-                    mode === "signup" ? "new-password" : "current-password"
-                  } // ✅ Phân biệt mật khẩu mới/cũ
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none"
                   required
                 />
@@ -185,7 +195,6 @@ const LoginModal = () => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  autoComplete="new-password"
                   className="w-full pl-10 pr-4 py-3 bg-secondary border border-border rounded-lg focus:outline-none"
                   required
                 />
