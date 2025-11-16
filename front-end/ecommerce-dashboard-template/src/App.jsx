@@ -18,6 +18,8 @@ import Products from "./components/Products";
 import { use } from "react";
 import { useDispatch } from "react-redux";
 import { getUser } from "./store/slices/authSlice";
+import { fetchAllUsers } from "./store/slices/adminSlice";
+import { fetchAllProducts } from "./store/slices/productsSlice";
 import { useEffect } from "react";
 
 function App() {
@@ -25,30 +27,30 @@ function App() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   useEffect(() => {
+    dispatch(getUser());
+  }, [dispatch]);
+
+  useEffect(() => {
     if (!isAuthenticated) {
-      dispatch(getUser());
+      dispatch(fetchAllUsers());
+      dispatch(fetchAllProducts());
     }
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated]);
 
   const renderDashboardContent = () => {
     switch (openedComponent) {
-      case "Dashboardd":
-        <Dashboard />;
-        break;
+      case "Dashboard":
+        return <Dashboard />;
       case "Orders":
-        <Orders />;
-        break;
+        return <Orders />;
       case "Users":
-        <Users />;
-        break;
+        return <Users />;
       case "Profile":
-        <Profile />;
-        break;
-      case "Products":
-        <Products />;
-        break;
-      default:
         return <Profile />;
+      case "Products":
+        return <Products />;
+      default:
+        return <Dashboard />;
     }
     // const views = {
     //   Dashboard: <Dashboard />,
