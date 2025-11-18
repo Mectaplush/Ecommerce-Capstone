@@ -118,7 +118,7 @@ export const deleteProduct = (id, page) => async (dispatch, getState) => {
   }
 };
 
-export const updateProduct = (id, updatedData) => async (dispatch) => {
+export const updateProduct = (updatedData,id) => async (dispatch) => {
   dispatch(productSlice.actions.updateProductRequest());
   try {
     const response = await axiosInstance

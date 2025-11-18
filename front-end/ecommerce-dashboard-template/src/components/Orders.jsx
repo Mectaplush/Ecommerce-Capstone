@@ -159,7 +159,7 @@ const Orders = () => {
                           order.order_items.map((item) => {
                             return (
                               <div
-                                key={item.order_id}
+                                key={item.order_item_id}
                                 className="flex items-center gap-4 mb-2 border-b pb-2"
                               >
                                 {item.image && (

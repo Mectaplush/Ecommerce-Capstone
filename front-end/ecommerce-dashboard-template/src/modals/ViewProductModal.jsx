@@ -4,6 +4,7 @@ import { toggleViewProductModal } from "../store/slices/extraSlice";
 
 const ViewProductModal = ({ selectedProduct }) => {
   const dispatch = useDispatch();
+  if (!selectedProduct) return null;
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center p-4">
@@ -19,7 +20,7 @@ const ViewProductModal = ({ selectedProduct }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Images */}
             <div className="grid grid-cols-2 gap-3">
-              {selectedProduct.images.map((img, idx) => (
+              {(selectedProduct.images || []).map((img, idx) => (
                 <img
                   key={idx}
                   src={img?.url}

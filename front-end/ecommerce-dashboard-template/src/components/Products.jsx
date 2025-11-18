@@ -189,8 +189,8 @@ const Products = () => {
       {isUpdateProductModalOpened && (
         <UpdateProductModal selectedProduct={selectedProduct} />
       )}
-      {isViewProductModalOpened && selectedProduct && (
-        <ViewProductModal product={selectedProduct} />
+      {isViewProductModalOpened && (
+        <ViewProductModal selectedProduct={selectedProduct} />
       )}
     </>
   );
